@@ -1691,7 +1691,109 @@ scaffoldKey.currentState! -> Gives access to ScaffoldState methods.
 - [Understanding Keys in Flutter: GlobalKey, LocalKey, ValueKey and UniqueKey](https://tomicriedel.medium.com/understanding-keys-in-flutter-globalkey-localkey-valuekey-and-uniquekey-48228e6acb82)
 
 ---
-## ⭐️
+## ⭐️ Understanding `parse()` vs `tryParse()` in Dart (Flutter)
+
+## Introduction
+
+When working with user input or external data, it’s common to receive values as strings that need to be converted into numbers (such as integers or doubles). Dart, the language used in Flutter, provides two main approaches for converting strings to numbers: `parse()` and `tryParse()`. Both methods are available for numeric types like `int` and `double`. Understanding their differences is crucial for writing robust and error-free code.
+
+## What is `parse()`?
+
+The `parse()` method attempts to convert a string into a number. If the conversion fails because the string cannot be interpreted as a valid number, `parse()` throws a `FormatException`. This makes `parse()` strict: it either successfully returns a number or immediately indicates an error situation by throwing an exception.
+
+**Key Characteristics**:  
+- Returns a number if the string is valid.
+- Throws a `FormatException` if invalid.
+- Used when you expect the string to always be valid or when you want to handle errors using exceptions.
+
+**Example**:
+```dart
+String numericString = "42";
+int result = int.parse(numericString); // result = 42
+
+String invalidString = "abc";
+int errorResult = int.parse(invalidString); 
+// Throws FormatException: Invalid number (at character 1)
+```
+
+**When to Use `parse()`**:  
+- When you’re certain the input is valid and want to rely on exceptions for error handling.
+- For scenarios where invalid input is genuinely exceptional and should not occur in normal application flow.
+
+## What is `tryParse()`?
+
+The `tryParse()` method also attempts to convert a string to a number, but it does not throw an exception if the conversion fails. Instead, it returns `null` for invalid inputs. This approach gives you more control over handling potential errors gracefully without dealing with exceptions.
+
+**Key Characteristics**:  
+- Returns a number if the string is valid.
+- Returns `null` if invalid (no exceptions thrown).
+- Used for more flexible error handling, allowing if/else conditions instead of exceptions.
+
+**Example**:
+```dart
+String numericString = "100";
+int? result = int.tryParse(numericString); // result = 100
+
+String invalidString = "xyz";
+int? nullResult = int.tryParse(invalidString); 
+// nullResult = null, no exception thrown
+```
+
+**When to Use `tryParse()`**:  
+- When you want to handle invalid data without exceptions.
+- Ideal for user inputs where invalid formats might be common and you’d prefer a simple conditional check instead of exception handling.
+
+## Comparison Table
+
+| Method      | Returns on Success | Returns on Failure       | Error Handling    | Use Case                                                 |
+|-------------|--------------------|--------------------------|-------------------|----------------------------------------------------------|
+| `parse()`   | Number (int/double)| Throws `FormatException` | Exception-based   | Strict scenarios where invalid input is unexpected       |
+| `tryParse()`| Number (int/double)| `null`                  | Conditional checks | User-friendly scenarios, gracefully handling invalid input |
+
+## Visual Representation
+
+```
++-----------------+      +----------------------+
+|     parse()     |      |     tryParse()      |
++-----------------+      +----------------------+
+| Input: "42"     |      | Input: "42"         |
+| Output: 42       |      | Output: 42          |
+|                 |      |                      |
+| Input: "abc"    |      | Input: "abc"        |
+| Throws Exception |      | Output: null         |
++-----------------+      +----------------------+
+```
+
+## Example in a Real-World Flutter Scenario
+
+Imagine building a form where users enter a product quantity. Using `tryParse()` makes sense because the user might enter invalid data:
+
+```dart
+TextFormField(
+  decoration: InputDecoration(labelText: 'Quantity'),
+  keyboardType: TextInputType.number,
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a quantity';
+    }
+    final number = int.tryParse(value);
+    if (number == null || number <= 0) {
+      return 'Must be a valid positive number';
+    }
+    return null; // Input is valid
+  },
+)
+```
+
+In this example, `tryParse()` returns `null` for invalid input, allowing for easy validation logic without exceptions.
+
+If you were absolutely sure that the input was always valid (for instance, data coming from a trusted API source), you might use `parse()` and wrap it in a `try-catch` block if needed.
+
+## References
+
+- [Dart Official Documentation: int.parse](https://api.dart.dev/stable/dart-core/int/parse.html)
+- [Dart Official Documentation: int.tryParse](https://api.dart.dev/stable/dart-core/int/tryParse.html)
+- [Dart Language Tour: Exceptions](https://dart.dev/guides/language/language-tour#exceptions)
 
 ---
 ## ⭐️
