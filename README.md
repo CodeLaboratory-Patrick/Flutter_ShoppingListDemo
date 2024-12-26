@@ -3105,7 +3105,177 @@ class DataScreen extends StatelessWidget {
 Working with requests and waiting for responses in Flutter centers on asynchronous programming. By sending an HTTP request and using `await` to pause execution until the server replies, you can handle data or errors effectively. `FutureBuilder` simplifies UI rendering for async tasks, automatically showing loading and error states. Adopting best practices like secure communication, robust error handling, and structured state management ensures a responsive, reliable user experience.
 
 ---
-## ⭐️
+## ⭐️ HTTP Status Codes: An Overview
+
+## Introduction
+
+When building or debugging applications that rely on HTTP communication, understanding **HTTP status codes** is essential. These codes are part of the HTTP standard and are sent by servers in response to requests, indicating whether the request was successful, if there was a problem on the client or server side, or if further action is needed. By properly handling these codes in your client (e.g., a Flutter app), you can display correct error messages, guide the user to retry, or confirm that data was received successfully.
+
+## Common HTTP Status Code Categories
+
+HTTP status codes are grouped into five major categories based on the first digit:
+
+1. **1xx: Informational**  
+   - Indicates that the request was received and the process is continuing.
+2. **2xx: Success**  
+   - The request was successfully received, understood, and processed by the server.
+3. **3xx: Redirection**  
+   - Further action is needed to complete the request (e.g., a redirect to a new URL).
+4. **4xx: Client Errors**  
+   - The request contains incorrect syntax or cannot be fulfilled by the server (e.g., resource not found).
+5. **5xx: Server Errors**  
+   - The server failed to fulfill a valid request due to an error on the server side.
+
+## Commonly Used HTTP Status Codes
+
+### 1xx: Informational
+
+| Code | Name                   | Description                                                       |
+|------|------------------------|-------------------------------------------------------------------|
+| 100  | Continue               | The server has received the request headers, and the client should proceed to send the request body. |
+| 101  | Switching Protocols    | The requester has asked the server to switch protocols, and the server has agreed to do so.          |
+
+**Example**:  
+- A client might receive `100 Continue` when sending a large request body in multiple chunks.
+
+### 2xx: Success
+
+| Code | Name                   | Description                                                         |
+|------|------------------------|---------------------------------------------------------------------|
+| 200  | OK                     | The request succeeded, and the resulting resource is returned in the response body.                    |
+| 201  | Created                | A new resource was successfully created, typically after a POST request.                                |
+| 202  | Accepted               | The request has been accepted for processing but is not yet completed.                                  |
+| 204  | No Content            | The request succeeded, but no content is returned. Often used for delete or update operations.           |
+
+**Example**:  
+- `200 OK`: When a Flutter app requests a user profile and receives the correct JSON data, it indicates success.  
+- `201 Created`: When posting a new user to a server, if the server successfully adds the user to the database, it returns `201`.
+
+### 3xx: Redirection
+
+| Code | Name                   | Description                                                            |
+|------|------------------------|------------------------------------------------------------------------|
+| 301  | Moved Permanently      | The resource has been moved to a new URL permanently.                  |
+| 302  | Found (Temporary Redirect) | The resource has been temporarily moved to a different URL.              |
+| 304  | Not Modified           | Used for caching. Indicates that the resource has not changed since last request. |
+
+**Example**:  
+- `301 Moved Permanently`: A server might redirect from an old API endpoint to a new one.  
+- `304 Not Modified`: If a Flutter app has a cached version of data, the server can reply with `304`, telling the client to use the cached version.
+
+### 4xx: Client Errors
+
+| Code | Name                   | Description                                                           |
+|------|------------------------|-----------------------------------------------------------------------|
+| 400  | Bad Request            | The server could not understand the request due to invalid syntax.    |
+| 401  | Unauthorized           | Authentication is required or has failed.                             |
+| 403  | Forbidden              | The server understands the request, but the client lacks permissions. |
+| 404  | Not Found              | The requested resource could not be found.                            |
+| 405  | Method Not Allowed     | The HTTP method used is not allowed for that resource.                |
+| 409  | Conflict               | The request conflicts with the current state of the server (e.g., duplicate resource). |
+| 429  | Too Many Requests      | The user has sent too many requests in a given period (rate limiting). |
+
+**Example**:  
+- `404 Not Found`: If your Flutter app requests a user ID that does not exist.  
+- `401 Unauthorized`: If you attempt to access an API endpoint that requires authentication without proper credentials.
+
+### 5xx: Server Errors
+
+| Code | Name                   | Description                                                       |
+|------|------------------------|-------------------------------------------------------------------|
+| 500  | Internal Server Error  | The server encountered an unexpected condition that prevented it from fulfilling the request. |
+| 501  | Not Implemented        | The server does not support the functionality required to fulfill the request.              |
+| 502  | Bad Gateway            | The server, acting as a gateway, received an invalid response from an upstream server.       |
+| 503  | Service Unavailable    | The server is currently unable to handle the request (due to overload or maintenance).       |
+| 504  | Gateway Timeout        | The server, acting as a gateway, did not receive a timely response from the upstream server. |
+
+**Example**:  
+- `500 Internal Server Error`: A bug in the server code leading to an unhandled exception.  
+- `503 Service Unavailable`: If the server is temporarily down for maintenance, you might see this code.
+
+## How to Use HTTP Status Codes
+
+1. **Check `statusCode`**  
+   In many libraries (like Dart’s `http` package), the response contains a `statusCode` field. You can decide how to handle each range:
+
+   ```dart
+   final response = await http.get(Uri.parse('https://example.com/data'));
+   if (response.statusCode == 200) {
+     // parse data
+   } else if (response.statusCode == 404) {
+     // show not found message
+   } else {
+     // handle other cases
+   }
+   ```
+
+2. **Display Informative Messages**  
+   Show user-friendly error messages or instructions based on the code. For example, a “Not Found” message for `404`, or “Try again later” for `503`.
+
+3. **Retry Logic**  
+   In some cases (like `500` or `503`), you might implement a retry mechanism.
+
+4. **Caching (304 Not Modified)**  
+   If you receive a `304`, you might use a cached copy of the resource to save bandwidth.
+
+## Diagram: Status Code Flow
+
+```
++----------------------+       +---------------------+
+|   Flutter App        | -->   |    Server (API)     |
+| (Sends Request)      |       | Processes request   |
++----------------------+       +---------------------+
+             |
+             v (Receives HTTP Status Code & Body)
++----------------------+
+|   statusCode checks  |
+|    if code == 200?   |
+|       parse JSON     |
+|    else if code == 404?
+|       handle NotFound|
++----------------------+
+```
+
+1. **Flutter** sends an HTTP request to the server.  
+2. **Server** processes the request and returns an HTTP status code (and possibly a body).  
+3. **Flutter** checks the `statusCode` and decides how to handle the response (success, error, redirect, etc.).
+
+## Practical Examples
+
+### Handling 200 and 404 in Flutter
+
+```dart
+final response = await http.get(Uri.parse('https://api.example.com/product/123'));
+switch (response.statusCode) {
+  case 200:
+    final data = jsonDecode(response.body);
+    print('Product name: ${data['name']}');
+    break;
+  case 404:
+    print('Product not found.');
+    break;
+  default:
+    print('Unexpected status: ${response.statusCode}');
+}
+```
+
+### Handling 403 or 401 (Unauthorized)
+
+```dart
+if (response.statusCode == 401 || response.statusCode == 403) {
+  // Prompt user to log in again or show an error message
+}
+```
+
+## References
+
+- [MDN Web Docs: HTTP Status Codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
+- [RFC 7231 - HTTP/1.1 Semantics and Content](https://tools.ietf.org/html/rfc7231)
+- [Flutter Official Docs: Networking & HTTP](https://docs.flutter.dev/development/data-and-backend/networking)
+
+## Conclusion
+
+HTTP status codes are the language through which servers inform clients about the outcome of their requests. By properly checking these status codes in your Flutter app, you can gracefully handle success, client-side errors (4xx), server-side errors (5xx), and more. This leads to clearer error handling, better user experience, and more reliable interactions with backend services.
 
 ---
 ## ⭐️
