@@ -2668,7 +2668,7 @@ Future<void> fetchData() async {
 
 ## Conclusion
 HTTP is the backbone of web communication, enabling client apps (like those built in Flutter) to interact with remote servers for data retrieval and storage. By understanding HTTP methods, status codes, and how to construct requests in Flutter, you can build rich, data-driven applications that provide up-to-date content and services to your users. Whether it’s a simple GET call to display a list of items or a more complex set of secure POST requests for user authentication, HTTP remains a central protocol in modern mobile and web development.
-```
+
 
 ---
 ## ⭐️ How Does HTTP Work in Flutter?
@@ -2782,7 +2782,6 @@ Step 4: Flutter app checks status code, parses data, updates UI accordingly.
 ## Conclusion
 
 HTTP is a cornerstone of how Flutter apps communicate with servers. Understanding the request-response cycle, choosing the correct methods, and properly handling responses is essential to building robust, data-driven applications. By leveraging packages like `http`, you can simplify and streamline your interaction with RESTful APIs, enabling your Flutter app to fetch data, submit forms, and more—efficiently and securely.
-```
 
 ---
 ## ⭐️ Sending a POST Request to a Firebase Backend in Flutter
@@ -2959,7 +2958,6 @@ This guide focuses on the second approach: sending an HTTP POST request to a **c
 ## Conclusion
 
 Using Firebase Cloud Functions as an HTTP backend for your Flutter app provides a straightforward way to separate client-side UI logic from server-side data processing. You can securely store data in Firestore or Realtime Database, handle complex logic on the server, and scale automatically with Firebase’s infrastructure. By implementing a simple `POST` endpoint, your Flutter app can create resources (like new items) in the backend with just a few lines of code.
-```
 
 ---
 ## ⭐️
